@@ -32,12 +32,17 @@
         <h1>Welcome</h1>
     </div>
     <div class="cont">
+        <% if (typeof error !== 'undefined') { %>
+            <div class="error" style="color: red;">
+                <%= error %>
+            </div>
+        <% } %>
         <form method="POST">
             Username:<br>
-            <input type="text" name="username">
+            <input type="text" name="username" required>
             <br>
             Password:<br>
-            <input type="password" name="password">
+            <input type="password" name="password" required>
             <br><br>
             <input type="submit" value="Login">
         </form>

@@ -34,11 +34,16 @@
         <h1>Registration</h1>
     </div>
     <div class="cont">
-        <form method='post' action='/register'>
+        <% if (typeof error !== 'undefined') { %>
+            <div class="error" style="color: red;">
+                <%= error %>
+            </div>
+        <% } %>
+        <form method='POST' action='/register'>
             Username: <br>
-            <input type="text" id="user" name="username"> <br>
+            <input type="text" id="user" name="username" required> <br>
             Password: <br>
-            <input type="password" id="password" name="password"> <br> <br>
+            <input type="password" id="password" name="password" required> <br> <br>
             <input type="submit" id="simple_click" class="btn btn-secondary" value="Register"> <br>
         </form>
     </div>
