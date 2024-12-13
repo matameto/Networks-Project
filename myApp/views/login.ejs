@@ -37,12 +37,17 @@
                 <%= error %>
             </div>
         <% } %>
+        <% if (typeof success !== 'undefined') { %>
+            <div class="success" style="color: rgb(0, 255, 0);">
+                <%= success %>
+            </div>
+        <% } %>
         <form method="POST">
             Username:<br>
-            <input type="text" name="username" required>
+            <input type="text" name="username" >
             <br>
             Password:<br>
-            <input type="password" name="password" required>
+            <input type="password" name="password" >
             <br><br>
             <input type="submit" value="Login">
         </form>

@@ -5,7 +5,7 @@ var fs = require('fs');
 var mongoClient = require('mongodb').MongoClient;
 var session = require('express-session');
 var bcrypt = require('bcryptjs');
-const { error } = require('console');
+const {ObjectId} = require('mongodb');
 
 var app = express();
 
@@ -53,28 +53,52 @@ async function startServerAndConnectToDB() {
 }
 
 
+// signup function
 app.post('/register', async (req, res) => {
-  const user = req.body.username;
- // check if username already exists
-  const existingUser = await db.collection('myCollection').findOne({
-      username: user
-  });
-  if (existingUser) {
-      return res.render('registration', { error: 'Username already exists' });
+  try {
+      const user = req.body.username;
+      const password = req.body.password;
+      
+      if (!user || !password) {
+          return res.render('registration', { error: 'Username and password are required' ,success: null});
+      }
+
+      // check if username already exists
+      const existingUser = await db.collection('myCollection').findOne({
+          username: user
+      });
+      
+      if (existingUser) {
+          return res.render('registration', { error: 'Username already exists' , success: null});
+      }
+
+      const hashedPassword = await bcrypt.hash(password, 10);
+      
+      await db.collection('myCollection').insertOne({
+          username: user,
+          password: hashedPassword,
+          wantToGo: []
+      });
+
+      return res.render('registration', {
+        error: null,
+        success: 'Registration successful! Redirecting to login...',
+        redirect: `
+            <script>
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            </script>
+        `
+    });
+      
+  } catch (err) {
+      console.error('Registration error:', err);
+      res.render('registration', { error: 'Failed to register' , success: null});
   }
- 
- 
-  const hashedPassword = await bcrypt.hash(req.body.password, 10);
-  db.collection('myCollection').insertOne({
-      username: user,
-      password: hashedPassword,
-      wantToGo: []
-  }, (err) => {
-      if (err) res.render('registration', { error: 'Failed to register' });
-      else res.redirect('/');
-  });
 });
 
+// login function 
 app.post('/', async (req, res) => {
   const user = await db.collection('myCollection').findOne({ 
       username: req.body.username 
@@ -88,6 +112,7 @@ app.post('/', async (req, res) => {
   }
 });
 
+// i added this for testing
 app.get('/logout', (req, res) => {
   req.session.destroy();
   res.send('Logged out successfully');
@@ -98,7 +123,65 @@ const isAuthenticated = (req, res, next) => {
   else res.status(401).send('Not authenticated');
 };
 
-// catch 404 and forward to error handler
+// want to go function
+
+app.post('/addToWantToGo', isAuthenticated, async (req, res) => {
+  try {
+      const destination = req.body.destination;
+      
+      // Convert string ID to ObjectId
+      const userId = new ObjectId(req.session.userId);
+
+      const user = await db.collection('myCollection').findOne({ _id: userId });
+        
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+
+      // Check if destination already exists in wantToGo array
+      if (user.wantToGo.includes(destination)) {
+        return res.status(400).json({
+            success: false,
+            message: 'Destination already in your Want to Go list'
+        });
+    }
+     
+      
+
+      // Now add the destination
+      const result = await db.collection('myCollection').updateOne(
+          { _id: userId },
+          { $addToSet: { wantToGo: destination } }
+      );
+
+
+      if (result.matchedCount === 0) {
+          return res.status(404).json({
+              success: false,
+              message: 'User not found'
+          });
+      }
+
+      res.json({
+          success: true,
+          message: 'Destination added successfully',
+          modifiedCount: result.modifiedCount
+      });
+
+  } catch (error) {
+      console.error('Error details:', error);
+      res.status(500).json({
+          success: false,
+          message: 'Failed to add destination',
+          error: error.message
+      });
+  }
+});
+// Add route to get user's Want to Go list
+
 
 // get requests to render pages
 app.get('/', function(req, res) {
