@@ -197,8 +197,30 @@ app.get('/home',isAuthenticated ,function(req, res) {
 });
 
 
-app.get('/wanttogo',isAuthenticated ,function(req, res) {
-  res.render('wanttogo');
+// Add this route before your other routes
+app.get('/wanttogo', isAuthenticated, async function(req, res) {
+  try {
+      const userId = new ObjectId(req.session.userId);
+      const user = await db.collection('myCollection').findOne({ _id: userId });
+      
+      if (!user) {
+          return res.render('wanttogo', { 
+              destinations: [],
+              error: 'User not found'
+          });
+      }
+
+      res.render('wanttogo', { 
+          destinations: user.wantToGo,
+          error: null
+      });
+  } catch (error) {
+      console.error('Error fetching want-to-go list:', error);
+      res.render('wanttogo', { 
+          destinations: [],
+          error: 'Failed to fetch destinations'
+      });
+  }
 });
 
 app.get('/hiking',isAuthenticated ,function(req, res) {

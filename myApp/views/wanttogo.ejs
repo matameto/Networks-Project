@@ -13,6 +13,19 @@
             text-align: center;
             -webkit-text-stroke: 1px blue;
         }
+
+
+        .destinations-list {
+            color: white;
+            margin: 20px;
+            padding: 20px;
+        }
+        .destination-item {
+            background: rgba(0, 0, 0, 0.5);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+        }
     </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -38,5 +51,28 @@
             </form>
         </div>
     </nav>
+
+    <div class="destinations-list">
+        <h2 style="color: white;">My Want-to-Go List</h2>
+        
+        <% if (error) { %>
+            <div style="color: red;">
+                <%= error %>
+            </div>
+        <% } %>
+
+        <% if (destinations && destinations.length > 0) { %>
+            <% destinations.forEach(function(destination) { %>
+                <div class="destination-item">
+                    <%= destination %>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div style="color: white;">
+                No destinations in your list yet.
+            </div>
+        <% } %>
+    </div>
+
 </body>
 </html>
