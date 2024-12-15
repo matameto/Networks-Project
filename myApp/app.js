@@ -263,10 +263,29 @@ app.get('/santorini', isAuthenticated,function(req, res) {
 
 
 
-app.post('/search', isAuthenticated,function(req, res) {  // this just makes the button clickable
-  res.render('searchresults');
-});
+app.post('/search', isAuthenticated, function(req, res) {
+    const searchTerm = req.body.Search.toLowerCase();
+    
+    // Define all destinations
+    const destinations = [
+        { name: 'Paris', path: '/paris' },
+        { name: 'Rome', path: '/rome' },
+        { name: 'Bali Island', path: '/bali' },
+        { name: 'Santorini Island', path: '/santorini' },
+        { name: 'Inca Trail to Machu Picchu', path: '/inca' },
+        { name: 'Annapurna Circuit', path: '/annapurna' }
+    ];
+    
+    // Filter destinations based on search term
+    const results = destinations.filter(dest => 
+        dest.name.toLowerCase().includes(searchTerm)
+    );
 
+    res.render('searchresults', { 
+        results: results,
+        searchTerm: req.body.Search
+    });
+});
 
 
 

@@ -8,10 +8,32 @@
             background-size: 100%;
         }
 
-        h1 {
+        h1 , h2{
             color: white;
             text-align: center;
             -webkit-text-stroke: 1px blue;
+        }
+
+        .search-results {
+            color: white;
+            margin: 20px;
+            padding: 20px;
+        }
+        .result-item {
+            background: rgba(0, 0, 0, 0.5);
+            margin: 10px 0;
+            padding: 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .result-item:hover {
+            background: rgba(0, 0, 0, 0.7);
+        }
+        .no-results {
+            color: white;
+            text-align: center;
+            margin-top: 20px;
         }
     </style>
     <meta charset="UTF-8">
@@ -38,5 +60,23 @@
             </form>
         </div>
     </nav>
+
+    <div class="search-results">
+        <h2>Search Results for "<%= searchTerm %>"</h2>
+        
+        <% if (results && results.length > 0) { %>
+            <% results.forEach(function(result) { %>
+                <div class="result-item" onclick="window.location.href='<%= result.path %>'">
+                    <%= result.name %>
+                </div>
+            <% }); %>
+        <% } else { %>
+            <div class="no-results">
+                No destinations found matching "<%= searchTerm %>"
+            </div>
+        <% } %>
+    </div>
+
+
 </body>
 </html>
