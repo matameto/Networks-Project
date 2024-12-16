@@ -1,7 +1,6 @@
 
 var express = require('express');
 var path = require('path');
-var fs = require('fs');
 var mongoClient = require('mongodb').MongoClient;
 var session = require('express-session');
 var bcrypt = require('bcryptjs');
@@ -112,16 +111,29 @@ app.post('/', async (req, res) => {
   }
 });
 
-// i added this for testing
-app.get('/logout', (req, res) => {
-  req.session.destroy();
-  res.send('Logged out successfully');
-});
 
 const isAuthenticated = (req, res, next) => {
   if (req.session.userId) next();
   else res.status(401).send('Not authenticated');
 };
+
+
+// i added this for testing
+app.get('/logout', isAuthenticated, (req, res) => {
+    req.session.destroy();
+    res.send(`
+        <div style="text-align: center; margin-top: 50px;">
+            Logged out successfully. Redirecting to login...
+            <script>
+                setTimeout(() => {
+                    window.location.href = '/';
+                }, 2000);
+            </script>
+        </div>
+    `);
+});
+
+
 
 // want to go function
 
@@ -219,6 +231,38 @@ app.get('/wanttogo', isAuthenticated, async function(req, res) {
       res.render('wanttogo', { 
           destinations: [],
           error: 'Failed to fetch destinations'
+      });
+  }
+});
+
+
+app.post('/removeFromWantToGo', isAuthenticated, async (req, res) => {
+  try {
+      const destination = req.body.destination;
+      const userId = new ObjectId(req.session.userId);
+
+      const result = await db.collection('myCollection').updateOne(
+          { _id: userId },
+          { $pull: { wantToGo: destination } }
+      );
+
+      if (result.modifiedCount === 0) {
+          return res.status(400).json({
+              success: false,
+              message: 'Failed to remove destination'
+          });
+      }
+
+      res.json({
+          success: true,
+          message: 'Destination removed successfully'
+      });
+
+  } catch (error) {
+      console.error('Error removing destination:', error);
+      res.status(500).json({
+          success: false,
+          message: 'Failed to remove destination'
       });
   }
 });

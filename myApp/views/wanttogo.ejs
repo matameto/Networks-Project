@@ -26,6 +26,15 @@
             padding: 15px;
             border-radius: 5px;
         }
+        .nav-item {
+            margin-right: 10px;
+        }   
+        .btn-outline-primary:hover {
+            color: white;
+        }
+        .btn-outline-danger:hover {
+            color: white;
+        }
     </style>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -33,6 +42,7 @@
     <title>Want-to-Go List</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
         integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 </head>
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark mb-2">
@@ -43,6 +53,16 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarSupportedContent">
             <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a class="btn btn-outline-primary my-2 my-sm-0 mr-2" href="/home">
+                        <i class="fas fa-home"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="btn btn-outline-danger my-2 my-sm-0" href="/logout">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </li>
             </ul>
             <form method="POST" action='/search' class="form-inline my-2 my-lg-0">
                 <input class="form-control mr-sm-2" name="Search" type="search" placeholder="Search"
@@ -64,7 +84,13 @@
         <% if (destinations && destinations.length > 0) { %>
             <% destinations.forEach(function(destination) { %>
                 <div class="destination-item">
-                    <%= destination %>
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <%= destination %>
+                        <button onclick="removeDestination('<%= destination %>')" 
+                                class="btn btn-danger btn-sm">
+                            <i class="fas fa-trash"></i> Remove
+                        </button>
+                    </div>
                 </div>
             <% }); %>
         <% } else { %>
@@ -73,6 +99,6 @@
             </div>
         <% } %>
     </div>
-
+    <script src="/js/wantToGo.js"></script>
 </body>
 </html>

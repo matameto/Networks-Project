@@ -36,3 +36,28 @@ function addToWantToGo(destination) {
 
     });
 }
+
+
+
+function removeDestination(destination) {
+    fetch('/removeFromWantToGo', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ destination: destination })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            // Refresh the page to show updated list
+            window.location.reload();
+        } else {
+            alert(data.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Failed to remove destination');
+    });
+}
